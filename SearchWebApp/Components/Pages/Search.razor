@@ -1,0 +1,235 @@
+@page "/search"
+@using Shared.Model
+@using SearchWebApp.Services
+@using Microsoft.AspNetCore.Components.Forms
+@using Microsoft.AspNetCore.Components.Web
+@inject SearchApiService SearchApi
+@inject IJSRuntime JSRuntime
+@rendermode InteractiveServer
+
+<PageTitle>Document Search</PageTitle>
+
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <h1 class="display-4 text-center mb-4">📄 Document Search Engine</h1>
+            
+            <!-- Search Form -->
+            <div class="card shadow-sm mb-4">
+                <div class="card-body">
+                    <EditForm Model="@searchModel" OnValidSubmit="@PerformSearch">
+                        <div class="row">
+                            <div class="col-md-8">
+                                <div class="input-group input-group-lg">
+                                    <InputText @bind-Value="searchModel.Query" 
+                                             class="form-control" 
+                                             placeholder="Enter search terms..."
+                                             @onkeypress="@HandleKeyPress" />
+                                    <button type="submit" class="btn btn-primary" disabled="@isSearching">
+                                        @if (isSearching)
+                                        {
+                                            <span class="spinner-border spinner-border-sm me-2"></span>
+                                        }
+                                        else
+                                        {
+                                            <i class="bi bi-search me-2"></i>
+                                        }
+                                        Search
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="row">
+                                    <div class="col-6">
+                                        <label class="form-label">Max Results:</label>
+                                        <InputNumber @bind-Value="searchModel.MaxResults" class="form-control" min="1" max="100" />
+                                    </div>
+                                    <div class="col-6">
+                                        <div class="form-check form-switch mt-4">
+                                            <InputCheckbox @bind-Value="searchModel.ShowTimestamps" class="form-check-input" id="timestampSwitch" />
+                                            <label class="form-check-label" for="timestampSwitch">Show Timestamps</label>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </EditForm>
+                </div>
+            </div>
+
+            <!-- API Status -->
+            <div class="alert @(apiAvailable ? "alert-success" : "alert-danger") d-flex align-items-center mb-4">
+                <i class="bi @(apiAvailable ? "bi-check-circle-fill" : "bi-exclamation-triangle-fill") me-2"></i>
+                <div>
+                    <strong>SearchAPI Status:</strong> 
+                    @(apiAvailable ? "Connected" : "Disconnected") 
+                    @if (!apiAvailable)
+                    {
+                        <span class="ms-2">
+                            <button class="btn btn-sm btn-outline-danger" @onclick="CheckApiStatus">
+                                <i class="bi bi-arrow-clockwise"></i> Retry
+                            </button>
+                        </span>
+                    }
+                </div>
+            </div>
+
+            <!-- Search Results -->
+            @if (searchResult != null)
+            {
+                <div class="card shadow-sm">
+                    <div class="card-header bg-light">
+                        <div class="row align-items-center">
+                            <div class="col">
+                                <h5 class="mb-0">
+                                    <i class="bi bi-file-text me-2"></i>
+                                    Search Results for: <span class="text-primary">"@string.Join(" ", searchResult.Query)"</span>
+                                </h5>
+                            </div>
+                            <div class="col-auto">
+                                <span class="badge bg-primary">@searchResult.Hits documents found</span>
+                                <span class="badge bg-secondary">@searchResult.TimeUsed.TotalMilliseconds ms</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        @if (searchResult.Ignored.Any())
+                        {
+                            <div class="alert alert-warning">
+                                <i class="bi bi-exclamation-triangle me-2"></i>
+                                <strong>Ignored terms:</strong> @string.Join(", ", searchResult.Ignored)
+                            </div>
+                        }
+
+                        @if (searchResult.DocumentHits.Any())
+                        {
+                            <div class="list-group">
+                                @for (int i = 0; i < searchResult.DocumentHits.Count; i++)
+                                {
+                                    var doc = searchResult.DocumentHits[i];
+                                    <div class="list-group-item">
+                                        <div class="d-flex w-100 justify-content-between align-items-start">
+                                            <div class="flex-grow-1">
+                                                <h6 class="mb-1">
+                                                    <span class="badge bg-secondary me-2">@(i + 1)</span>
+                                                    <code class="text-primary">@GetRelativePath(doc.Document.mUrl)</code>
+                                                </h6>
+                                                <p class="mb-1 text-muted">
+                                                    <i class="bi bi-file-text me-1"></i>
+                                                    Full path: @doc.Document.mUrl
+                                                </p>
+                                                @if (searchModel.ShowTimestamps)
+                                                {
+                                                    <p class="mb-1">
+                                                        <small class="text-muted">
+                                                            <i class="bi bi-clock me-1"></i>
+                                                            Indexed: @doc.Document.mIdxTime | 
+                                                            Created: @doc.Document.mCreationTime
+                                                        </small>
+                                                    </p>
+                                                }
+                                                @if (doc.Missing.Any())
+                                                {
+                                                    <p class="mb-0">
+                                                        <small class="text-warning">
+                                                            <i class="bi bi-exclamation-circle me-1"></i>
+                                                            Missing terms: [@string.Join(", ", doc.Missing)]
+                                                        </small>
+                                                    </p>
+                                                }
+                                            </div>
+                                            <div class="text-end">
+                                                <span class="badge bg-success">@doc.NoOfHits match@(doc.NoOfHits != 1 ? "es" : "")</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                }
+                            </div>
+                        }
+                        else
+                        {
+                            <div class="text-center py-5">
+                                <i class="bi bi-search text-muted" style="font-size: 4rem;"></i>
+                                <h4 class="text-muted mt-3">No documents found</h4>
+                                <p class="text-muted">Try different search terms or check your spelling.</p>
+                            </div>
+                        }
+                    </div>
+                </div>
+            }
+            else if (hasSearched && searchResult == null)
+            {
+                <div class="alert alert-danger">
+                    <i class="bi bi-exclamation-triangle me-2"></i>
+                    <strong>Search failed!</strong> Unable to connect to SearchAPI. Please ensure the API is running on http://localhost:5281
+                </div>
+            }
+        </div>
+    </div>
+</div>
+
+@code {
+    private SearchModel searchModel = new();
+    private SearchResult? searchResult;
+    private bool isSearching = false;
+    private bool hasSearched = false;
+    private bool apiAvailable = false;
+
+    public class SearchModel
+    {
+        public string Query { get; set; } = "";
+        public int MaxResults { get; set; } = 20;
+        public bool ShowTimestamps { get; set; } = true;
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        await CheckApiStatus();
+    }
+
+    private async Task CheckApiStatus()
+    {
+        apiAvailable = await SearchApi.IsApiAvailableAsync();
+        StateHasChanged();
+    }
+
+    private async Task PerformSearch()
+    {
+        if (string.IsNullOrWhiteSpace(searchModel.Query) || !apiAvailable)
+            return;
+
+        isSearching = true;
+        hasSearched = true;
+        StateHasChanged();
+
+        try
+        {
+            var queryTerms = searchModel.Query.Split(' ', StringSplitOptions.RemoveEmptyEntries);
+            searchResult = await SearchApi.SearchAsync(queryTerms, searchModel.MaxResults);
+        }
+        finally
+        {
+            isSearching = false;
+            StateHasChanged();
+        }
+    }
+
+    private async Task HandleKeyPress(KeyboardEventArgs e)
+    {
+        if (e.Key == "Enter")
+        {
+            await PerformSearch();
+        }
+    }
+
+    private string GetRelativePath(string fullPath)
+    {
+        // Extract just the filename and parent folder for cleaner display
+        var parts = fullPath.Split('\\', StringSplitOptions.RemoveEmptyEntries);
+        if (parts.Length >= 2)
+        {
+            return $"...\\{parts[^2]}\\{parts[^1]}";
+        }
+        return Path.GetFileName(fullPath);
+    }
+}
