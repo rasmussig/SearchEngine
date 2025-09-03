@@ -1,15 +1,20 @@
 ﻿using System;
+using System.Text.Json.Serialization;
+
 namespace Shared.Model
 {
     public class BEDocument
     {
-        public int mId;
+        [JsonPropertyName("mId")]
+        public int mId { get; set; }
 
-        public String mUrl;
+        [JsonPropertyName("mUrl")]
+        public String mUrl { get; set; }
 
-        public String mIdxTime;
+        [JsonPropertyName("mIdxTime")]
+        public String mIdxTime { get; set; }
 
-        public String mCreationTime;
-
+        [JsonPropertyName("mCreationTime")]
+        public String mCreationTime { get; set; }
     }
 }

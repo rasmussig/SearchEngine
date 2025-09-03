@@ -1,24 +1,26 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace ConsoleSearch
 {
     public class App
     {
+        private ApiSearchLogic _apiSearchLogic;
+
         public App()
         {
+            _apiSearchLogic = new ApiSearchLogic();
         }
 
-        public void Run()
+        public async Task RunAsync()
         {
-            SearchLogic mSearchLogic = new SearchLogic(new DatabaseSqlite());
-            
-
-            Console.WriteLine("Console Search");
+            Console.WriteLine("Console Search (Pure API Client)");
             Console.WriteLine($"Case sensitive search: {(Config.CaseSensitive ? "ON" : "OFF")}");
             Console.WriteLine($"View timestamps: {(Config.ViewTimeStamps ? "ON" : "OFF")}");
             Console.WriteLine($"Max results: {(Config.MaxResults?.ToString() ?? "ALL")}");
             Console.WriteLine("Commands: /casesensitive=on or /casesensitive=off, /timestamp=on or /timestamp=off, /results=X or /results=all");
+            Console.WriteLine("Mode: API Only - All search logic is on the server");
             
             while (true)
             {
@@ -87,12 +89,20 @@ namespace ConsoleSearch
                     continue;
                 }
 
+                // Perform search via API only
                 var query = input.Split(" ", StringSplitOptions.RemoveEmptyEntries);
                 
-                // Use MaxResults from config, or int.MaxValue if null (show all)
                 int maxResults = Config.MaxResults ?? int.MaxValue;
-                var result = mSearchLogic.Search(query, maxResults);
+                
+                var result = await _apiSearchLogic.SearchAsync(query, maxResults);
+                
+                if (result == null)
+                {
+                    Console.WriteLine("Failed to get results from API. Make sure SearchAPI is running on http://localhost:5281");
+                    continue;
+                }
 
+                // Display results - same format as before
                 if (result.Ignored.Count > 0) {
                     Console.WriteLine($"Ignored: {string.Join(',', result.Ignored)}");
                 }
@@ -100,6 +110,7 @@ namespace ConsoleSearch
                 int idx = 1;
                 foreach (var doc in result.DocumentHits) {
                     Console.WriteLine($"{idx} : {doc.Document.mUrl} -- contains {doc.NoOfHits} search terms");
+                    
                     if (Config.ViewTimeStamps)
                     {
                         Console.WriteLine("Index time: " + doc.Document.mIdxTime);
@@ -113,9 +124,6 @@ namespace ConsoleSearch
 
         string ArrayAsString(string[] s) {
             return s.Length == 0?"[]":$"[{String.Join(',', s)}]";
-            //foreach (var str in s)
-            //    res += str + ", ";
-            //return res.Substring(0, res.Length - 2) + "]";
         }
     }
 }

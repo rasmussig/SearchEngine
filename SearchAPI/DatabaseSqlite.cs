@@ -1,11 +1,11 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using Shared;
 using Shared.Model;
 using Microsoft.Data.Sqlite;
 
-namespace ConsoleSearch
+namespace SearchAPI
 {
     public class DatabaseSqlite : IDatabase
     {
@@ -72,10 +72,6 @@ namespace ConsoleSearch
 
         private string AsString(List<int> x) => $"({string.Join(',', x)})";
 
-
-
-       
-
         private Dictionary<string, int> GetAllWords()
         {
             Dictionary<string, int> res = new Dictionary<string, int>();
@@ -112,6 +108,7 @@ namespace ConsoleSearch
                     var idxTime = reader.GetString(2);
                     var creationTime = reader.GetString(3);
 
+                    // Return data as-is from database
                     res.Add(new BEDocument { mId = id, mUrl = url, mIdxTime = idxTime, mCreationTime = creationTime });
                 }
             }

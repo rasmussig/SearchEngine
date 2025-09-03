@@ -1,8 +1,8 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using Shared.Model;
 
-namespace ConsoleSearch
+namespace SearchAPI
 {
     public class SearchLogic
     {
@@ -35,16 +35,16 @@ namespace ConsoleSearch
 
             // compose the result.
             // all the documentHit
-            List<DocumentHit> docresult = new List<DocumentHit>();
+            List<Shared.Model.DocumentHit> docresult = new List<Shared.Model.DocumentHit>();
             int idx = 0;
             foreach (var doc in mDatabase.GetDocDetails(top))
             {
                 var missing = mDatabase.WordsFromIds(mDatabase.getMissing(doc.mId, wordIds));
                   
-                docresult.Add(new DocumentHit(doc, docIds[idx++].Value, missing));
+                docresult.Add(new Shared.Model.DocumentHit(doc, docIds[idx++].Value, missing));
             }
 
-            return new SearchResult(query, docIds.Count, docresult, ignored, DateTime.Now - start);
+            return new Shared.Model.SearchResult(query, docIds.Count, docresult, ignored, DateTime.Now - start);
         }
     }
 }
