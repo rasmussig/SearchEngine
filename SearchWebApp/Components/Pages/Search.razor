@@ -118,18 +118,18 @@
                                     <div class="list-group-item">
                                         <div class="d-flex w-100 justify-content-between align-items-start">
                                             <div class="flex-grow-1">
-                                                <h6 class="mb-1">
+                                                <h6 class="mb-1 text-light">
                                                     <span class="badge bg-secondary me-2">@(i + 1)</span>
                                                     <code class="text-primary">@GetRelativePath(doc.Document.mUrl)</code>
                                                 </h6>
-                                                <p class="mb-1 text-muted">
+                                                <p class="mb-1 text-light">
                                                     <i class="bi bi-file-text me-1"></i>
                                                     Full path: @doc.Document.mUrl
                                                 </p>
                                                 @if (searchModel.ShowTimestamps)
                                                 {
                                                     <p class="mb-1">
-                                                        <small class="text-muted">
+                                                        <small class="text-light">
                                                             <i class="bi bi-clock me-1"></i>
                                                             Indexed: @doc.Document.mIdxTime | 
                                                             Created: @doc.Document.mCreationTime
