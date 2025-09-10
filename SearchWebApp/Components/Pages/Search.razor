@@ -1,4 +1,4 @@
-@page "/search"
+@page "/"
 @using Shared.Model
 @using SearchWebApp.Services
 @using Microsoft.AspNetCore.Components.Forms
@@ -49,6 +49,10 @@
                                             <InputCheckbox @bind-Value="searchModel.ShowTimestamps" class="form-check-input" id="timestampSwitch" />
                                             <label class="form-check-label" for="timestampSwitch">Show Timestamps</label>
                                         </div>
+                                        <div class="form-check form-switch mt-2">
+                                            <InputCheckbox @bind-Value="searchModel.CaseSensitive" class="form-check-input" id="caseSensitiveSwitch" />
+                                            <label class="form-check-label" for="caseSensitiveSwitch">Case Sensitive</label>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -84,6 +88,10 @@
                                 <h5 class="mb-0">
                                     <i class="bi bi-file-text me-2"></i>
                                     Search Results for: <span class="text-primary">"@string.Join(" ", searchResult.Query)"</span>
+                                    @if (searchModel.CaseSensitive)
+                                    {
+                                        <small class="badge bg-info ms-2">Case Sensitive</small>
+                                    }
                                 </h5>
                             </div>
                             <div class="col-auto">
@@ -180,6 +188,7 @@
         public string Query { get; set; } = "";
         public int MaxResults { get; set; } = 20;
         public bool ShowTimestamps { get; set; } = true;
+        public bool CaseSensitive { get; set; } = false;
     }
 
     protected override async Task OnInitializedAsync()
@@ -205,7 +214,7 @@
         try
         {
             var queryTerms = searchModel.Query.Split(' ', StringSplitOptions.RemoveEmptyEntries);
-            searchResult = await SearchApi.SearchAsync(queryTerms, searchModel.MaxResults);
+            searchResult = await SearchApi.SearchAsync(queryTerms, searchModel.MaxResults, searchModel.CaseSensitive);
         }
         finally
         {

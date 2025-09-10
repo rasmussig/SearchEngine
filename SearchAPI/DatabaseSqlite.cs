@@ -165,7 +165,7 @@ namespace SearchAPI
             return result;
         }
 
-        public List<int> GetWordIds(string[] query, out List<string> outIgnored)
+        public List<int> GetWordIds(string[] query, out List<string> outIgnored, bool caseSensitive = false)
         {
             if (mWords == null)
                 mWords = GetAllWords();
@@ -176,7 +176,7 @@ namespace SearchAPI
             {
                 bool found = false;
                 
-                if (Config.CaseSensitive)
+                if (caseSensitive)
                 {
                     // Case sensitive - exact match only
                     if (mWords.ContainsKey(aWord))

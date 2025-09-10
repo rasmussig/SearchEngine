@@ -15,7 +15,7 @@ namespace SearchAPI.Controllers
         }
 
         [HttpGet]
-        public IActionResult Search([FromQuery] string query, [FromQuery] int maxResults = 20, [FromQuery] bool showFullPaths = false)
+        public IActionResult Search([FromQuery] string query, [FromQuery] int maxResults = 20, [FromQuery] bool showFullPaths = false, [FromQuery] bool caseSensitive = false)
         {
             try
             {
@@ -28,7 +28,7 @@ namespace SearchAPI.Controllers
                 var queryWords = query.Split(' ', StringSplitOptions.RemoveEmptyEntries);
                 
                 // Perform search
-                var result = _searchLogic.Search(queryWords, maxResults);
+                var result = _searchLogic.Search(queryWords, maxResults, caseSensitive);
                 
                 return Ok(result);
             }
@@ -48,7 +48,7 @@ namespace SearchAPI.Controllers
                     return BadRequest("Query is required");
                 }
 
-                var result = _searchLogic.Search(request.Query, request.MaxResults ?? 20);
+                var result = _searchLogic.Search(request.Query, request.MaxResults ?? 20, request.CaseSensitive);
                 
                 return Ok(result);
             }
@@ -64,5 +64,6 @@ namespace SearchAPI.Controllers
         public string[] Query { get; set; } = Array.Empty<string>();
         public int? MaxResults { get; set; }
         public bool ShowFullPaths { get; set; } = false;
+        public bool CaseSensitive { get; set; } = false;
     }
 }

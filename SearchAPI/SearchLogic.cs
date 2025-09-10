@@ -16,14 +16,14 @@ namespace SearchAPI
         /* Perform search of documents containing words from query. The result will
          * contain details about amost maxAmount of documents.
          */
-        public SearchResult Search(String[] query, int maxAmount)
+        public SearchResult Search(String[] query, int maxAmount, bool caseSensitive = false)
         {
             List<string> ignored;
 
             DateTime start = DateTime.Now;
 
             // Convert words to wordids
-            var wordIds = mDatabase.GetWordIds(query, out ignored);
+            var wordIds = mDatabase.GetWordIds(query, out ignored, caseSensitive);
 
             // perform the search - get all docIds
             var docIds =  mDatabase.GetDocuments(wordIds);

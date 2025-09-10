@@ -15,14 +15,15 @@ namespace SearchWebApp.Services
             _apiBaseUrl = configuration["SearchApi:BaseUrl"] ?? "http://localhost:5281";
         }
 
-        public async Task<SearchResult?> SearchAsync(string[] query, int maxResults = 20)
+        public async Task<SearchResult?> SearchAsync(string[] query, int maxResults = 20, bool caseSensitive = false)
         {
             try
             {
                 var searchRequest = new
                 {
                     Query = query,
-                    MaxResults = maxResults
+                    MaxResults = maxResults,
+                    CaseSensitive = caseSensitive
                 };
 
                 var json = JsonSerializer.Serialize(searchRequest);
