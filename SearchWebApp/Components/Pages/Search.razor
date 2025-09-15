@@ -1,178 +1,215 @@
 @page "/"
 @using Shared.Model
 @using SearchWebApp.Services
-@using Microsoft.AspNetCore.Components.Forms
-@using Microsoft.AspNetCore.Components.Web
 @inject SearchApiService SearchApi
 @inject IJSRuntime JSRuntime
 @rendermode InteractiveServer
 
-<PageTitle>Document Search</PageTitle>
+<div class="min-vh-100 bg-light">
+    <!-- Header -->
+    <header class="bg-white border-bottom shadow-sm">
+        <div class="container py-4">
+            <div class="d-flex align-items-center justify-content-center">
+                <i class="bi bi-file-text fs-1 text-primary me-3"></i>
+                <h1 class="h1 mb-0 text-dark">Document Search Engine</h1>
+            </div>
+        </div>
+    </header>
 
-<div class="container-fluid">
-    <div class="row">
-        <div class="col-12">
-            <h1 class="display-4 text-center mb-4">📄 Document Search Engine</h1>
-            
-            <!-- Search Form -->
-            <div class="card shadow-sm mb-4">
-                <div class="card-body">
-                    <EditForm Model="@searchModel" OnValidSubmit="@PerformSearch">
-                        <div class="row">
-                            <div class="col-md-8">
-                                <div class="input-group input-group-lg">
-                                    <InputText @bind-Value="searchModel.Query" 
-                                             class="form-control" 
-                                             placeholder="Enter search terms..."
-                                             @onkeypress="@HandleKeyPress" />
-                                    <button type="submit" class="btn btn-primary" disabled="@isSearching">
-                                        @if (isSearching)
-                                        {
-                                            <span class="spinner-border spinner-border-sm me-2"></span>
-                                        }
-                                        else
-                                        {
-                                            <i class="bi bi-search me-2"></i>
-                                        }
-                                        Search
-                                    </button>
-                                </div>
+    <div class="container py-5">
+        <!-- Main Search Card -->
+        <div class="card border-0 shadow-lg rounded-4 mb-4">
+            <div class="card-body p-5">
+                <form @onsubmit="@PerformSearch" @onsubmit:preventDefault="true">
+                    <!-- Search Input Row -->
+                    <div class="row justify-content-center mb-3">
+                        <div class="col-12 col-lg-8">
+                            <div class="input-group input-group-lg">
+                                <span class="input-group-text bg-white border-end-0 rounded-start-pill">
+                                    <i class="bi bi-search text-muted"></i>
+                                </span>
+                                <input type="text" @bind="searchModel.Query"
+                                    class="form-control border-start-0 border-end-0" placeholder="Enter search terms..."
+                                    @onkeypress="@HandleKeyPress" />
+                                <button type="submit" class="btn btn-dark rounded-end-pill px-4"
+                                    disabled="@isSearching">
+                                    @if (isSearching)
+                                    {
+                                        <span class="spinner-border spinner-border-sm me-2"></span>
+                                    }
+                                    Search
+                                </button>
                             </div>
-                            <div class="col-md-4">
-                                <div class="row">
-                                    <div class="col-6">
-                                        <label class="form-label">Max Results:</label>
-                                        <InputNumber @bind-Value="searchModel.MaxResults" class="form-control" min="1" max="100" />
-                                    </div>
-                                    <div class="col-6">
-                                        <div class="form-check form-switch mt-4">
-                                            <InputCheckbox @bind-Value="searchModel.ShowTimestamps" class="form-check-input" id="timestampSwitch" />
-                                            <label class="form-check-label" for="timestampSwitch">Show Timestamps</label>
-                                        </div>
-                                        <div class="form-check form-switch mt-2">
-                                            <InputCheckbox @bind-Value="searchModel.CaseSensitive" class="form-check-input" id="caseSensitiveSwitch" />
-                                            <label class="form-check-label" for="caseSensitiveSwitch">Case Sensitive</label>
-                                        </div>
-                                    </div>
+                        </div>
+                    </div>
+
+                    <!-- Max Results Row -->
+                    <div class="row justify-content-center mb-3">
+                        <div class="col-12 col-lg-8">
+                            <div class="d-flex justify-content-center">
+                                <div>
+                                    <label class="form-label mb-1 fw-medium small text-dark">Max Results:</label>
+                                    <select @bind="searchModel.MaxResults"
+                                        class="form-select form-select-sm rounded-pill">
+                                        <option value="10">10</option>
+                                        <option value="20">20</option>
+                                        <option value="50">50</option>
+                                        <option value="100">100</option>
+                                    </select>
                                 </div>
                             </div>
                         </div>
-                    </EditForm>
-                </div>
-            </div>
+                    </div>
 
-            <!-- API Status -->
-            <div class="alert @(apiAvailable ? "alert-success" : "alert-danger") d-flex align-items-center mb-4">
-                <i class="bi @(apiAvailable ? "bi-check-circle-fill" : "bi-exclamation-triangle-fill") me-2"></i>
-                <div>
-                    <strong>SearchAPI Status:</strong> 
-                    @(apiAvailable ? "Connected" : "Disconnected") 
-                    @if (!apiAvailable)
+                    <!-- Toggle Switches Row -->
+                    <div class="row justify-content-center mb-4">
+                        <div class="col-12 col-lg-8">
+                            <div class="d-flex justify-content-center gap-4">
+                                <div class="form-check form-switch">
+                                    <input type="checkbox" @bind="searchModel.ShowTimestamps"
+                                        class="form-check-input bg-success" id="timestampSwitch" />
+                                    <label class="form-check-label small fw-medium text-dark" for="timestampSwitch">
+                                        Show Timestamps
+                                    </label>
+                                </div>
+
+                                <div class="form-check form-switch">
+                                    <input type="checkbox" checked="@searchModel.CaseSensitive"
+                                        @onchange="OnCaseSensitiveChanged" class="form-check-input bg-success"
+                                        id="caseSensitiveSwitch" />
+                                    <label class="form-check-label small fw-medium text-dark" for="caseSensitiveSwitch">
+                                        Case Sensitive
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- API Status -->
+        <div
+            class="alert @(apiAvailable ? "alert-success" : "alert-danger") d-flex align-items-center border-0 rounded-pill mb-4">
+            <div class="@(apiAvailable ? "bg-success" : "bg-danger") rounded-circle me-2"
+                style="width: 8px; height: 8px;"></div>
+            <strong>SearchAPI Status: </strong> @(apiAvailable ? "Connected" : "Disconnected")
+            @if (!apiAvailable)
+            {
+                <button class="btn btn-sm btn-outline-danger ms-auto rounded-pill" @onclick="CheckApiStatus">
+                    <i class="bi bi-arrow-clockwise me-1"></i> Retry
+                </button>
+            }
+        </div>
+
+        <!-- Search Results -->
+        @if (searchResult != null)
+        {
+            <div class="card border-0 shadow-sm rounded-4">
+                <div class="card-header bg-white border-0 rounded-top-4 py-4">
+                    <div class="row align-items-center">
+                        <div class="col">
+                            <div class="d-flex align-items-center gap-2 flex-wrap">
+                                <h5 class="mb-0">Search Results for: "<span class="text-primary">@string.Join(" ",
+                                                                            searchResult.Query)</span>"</h5>
+                            @if (searchModel.CaseSensitive)
+                                {
+                                    <span class="badge bg-info rounded-pill">Case Sensitive</span>
+                                }
+                            </div>
+                        </div>
+                        <div class="col-auto">
+                            <div class="d-flex gap-2">
+                                <span class="badge bg-primary rounded-pill">@searchResult.Hits documents found</span>
+                                <span class="badge bg-secondary rounded-pill">@searchResult.TimeUsed.TotalMilliseconds
+                                    ms</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-body p-4">
+                    @if (searchResult.Ignored.Any())
                     {
-                        <span class="ms-2">
-                            <button class="btn btn-sm btn-outline-danger" @onclick="CheckApiStatus">
-                                <i class="bi bi-arrow-clockwise"></i> Retry
-                            </button>
-                        </span>
+                        <div class="alert alert-warning border-0 rounded-pill">
+                            <i class="bi bi-exclamation-triangle me-2"></i>
+                            <strong>Ignored terms:</strong> @string.Join(", ", searchResult.Ignored)
+                        </div>
+                    }
+
+                    @if (searchResult.DocumentHits.Any())
+                    {
+                        <div class="row g-3">
+                            @for (int i = 0; i < searchResult.DocumentHits.Count; i++)
+                            {
+                                var doc = searchResult.DocumentHits[i];
+                                <div class="col-12">
+                                    <div class="card border rounded-4">
+                                        <div class="card-body p-4">
+                                            <div class="d-flex align-items-start justify-content-between">
+                                                <div class="flex-grow-1 min-w-0">
+                                                    <div class="d-flex align-items-center gap-3 mb-2">
+                                                        <span
+                                                            class="badge bg-primary rounded-circle d-flex align-items-center justify-content-center"
+                                                            style="width: 32px; height: 32px; font-size: 0.875rem;">
+                                                            @(i + 1)
+                                                        </span>
+                                                        <code class="text-primary text-break h6 mb-0">
+                                                                                    @GetRelativePath(doc.Document.mUrl)
+                                                                                </code>
+                                                    </div>
+
+                                                    <div class="text-muted small mb-2">
+                                                        <i class="bi bi-folder me-1"></i>
+                                                        <strong>Full path:</strong>
+                                                        <span class="text-break">@doc.Document.mUrl</span>
+                                                    </div>
+
+                                                    @if (searchModel.ShowTimestamps)
+                                                    {
+                                                        <div class="text-muted" style="font-size: 0.75rem;">
+                                                            <i class="bi bi-clock me-1"></i>
+                                                            Indexed: @doc.Document.mIdxTime | Created: @doc.Document.mCreationTime
+                                                        </div>
+                                                    }
+
+                                                    @if (doc.Missing.Any())
+                                                    {
+                                                        <div class="text-warning mt-2" style="font-size: 0.75rem;">
+                                                            <i class="bi bi-exclamation-circle me-1"></i>
+                                                            Missing terms: [@string.Join(", ", doc.Missing)]
+                                                        </div>
+                                                    }
+                                                </div>
+
+                                                <span class="badge bg-success rounded-pill ms-3 flex-shrink-0">
+                                                    @doc.NoOfHits match@(doc.NoOfHits != 1 ? "es" : "")
+                                                </span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            }
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="text-center py-5">
+                            <i class="bi bi-search text-muted" style="font-size: 4rem;"></i>
+                            <h4 class="text-muted mt-3">No documents found</h4>
+                            <p class="text-muted">Try different search terms or check your spelling.</p>
+                        </div>
                     }
                 </div>
             </div>
-
-            <!-- Search Results -->
-            @if (searchResult != null)
-            {
-                <div class="card shadow-sm">
-                    <div class="card-header bg-light">
-                        <div class="row align-items-center">
-                            <div class="col">
-                                <h5 class="mb-0">
-                                    <i class="bi bi-file-text me-2"></i>
-                                    Search Results for: <span class="text-primary">"@string.Join(" ", searchResult.Query)"</span>
-                                    @if (searchModel.CaseSensitive)
-                                    {
-                                        <small class="badge bg-info ms-2">Case Sensitive</small>
-                                    }
-                                </h5>
-                            </div>
-                            <div class="col-auto">
-                                <span class="badge bg-primary">@searchResult.Hits documents found</span>
-                                <span class="badge bg-secondary">@searchResult.TimeUsed.TotalMilliseconds ms</span>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="card-body">
-                        @if (searchResult.Ignored.Any())
-                        {
-                            <div class="alert alert-warning">
-                                <i class="bi bi-exclamation-triangle me-2"></i>
-                                <strong>Ignored terms:</strong> @string.Join(", ", searchResult.Ignored)
-                            </div>
-                        }
-
-                        @if (searchResult.DocumentHits.Any())
-                        {
-                            <div class="list-group">
-                                @for (int i = 0; i < searchResult.DocumentHits.Count; i++)
-                                {
-                                    var doc = searchResult.DocumentHits[i];
-                                    <div class="list-group-item">
-                                        <div class="d-flex w-100 justify-content-between align-items-start">
-                                            <div class="flex-grow-1">
-                                                <h6 class="mb-1 text-light">
-                                                    <span class="badge bg-secondary me-2">@(i + 1)</span>
-                                                    <code class="text-primary">@GetRelativePath(doc.Document.mUrl)</code>
-                                                </h6>
-                                                <p class="mb-1 text-light">
-                                                    <i class="bi bi-file-text me-1"></i>
-                                                    Full path: @doc.Document.mUrl
-                                                </p>
-                                                @if (searchModel.ShowTimestamps)
-                                                {
-                                                    <p class="mb-1">
-                                                        <small class="text-light">
-                                                            <i class="bi bi-clock me-1"></i>
-                                                            Indexed: @doc.Document.mIdxTime | 
-                                                            Created: @doc.Document.mCreationTime
-                                                        </small>
-                                                    </p>
-                                                }
-                                                @if (doc.Missing.Any())
-                                                {
-                                                    <p class="mb-0">
-                                                        <small class="text-warning">
-                                                            <i class="bi bi-exclamation-circle me-1"></i>
-                                                            Missing terms: [@string.Join(", ", doc.Missing)]
-                                                        </small>
-                                                    </p>
-                                                }
-                                            </div>
-                                            <div class="text-end">
-                                                <span class="badge bg-success">@doc.NoOfHits match@(doc.NoOfHits != 1 ? "es" : "")</span>
-                                            </div>
-                                        </div>
-                                    </div>
-                                }
-                            </div>
-                        }
-                        else
-                        {
-                            <div class="text-center py-5">
-                                <i class="bi bi-search text-muted" style="font-size: 4rem;"></i>
-                                <h4 class="text-muted mt-3">No documents found</h4>
-                                <p class="text-muted">Try different search terms or check your spelling.</p>
-                            </div>
-                        }
-                    </div>
-                </div>
-            }
-            else if (hasSearched && searchResult == null)
-            {
-                <div class="alert alert-danger">
-                    <i class="bi bi-exclamation-triangle me-2"></i>
-                    <strong>Search failed!</strong> Unable to connect to SearchAPI. Please ensure the API is running on http://localhost:5281
-                </div>
-            }
-        </div>
+        }
+        else if (hasSearched && searchResult == null && !isSearching)
+        {
+            <div class="alert alert-danger border-0 rounded-pill">
+                <i class="bi bi-exclamation-triangle me-2"></i>
+                <strong>Search failed!</strong> Unable to connect to SearchAPI. Please ensure the API is running on
+                http://localhost:5281
+            </div>
+        }
     </div>
 </div>
 
@@ -240,5 +277,14 @@
             return $"...\\{parts[^2]}\\{parts[^1]}";
         }
         return Path.GetFileName(fullPath);
+    }
+    private async Task OnCaseSensitiveChanged(ChangeEventArgs e)
+    {
+        searchModel.CaseSensitive = (bool)e.Value; // Manuel opdatering
+
+        if (hasSearched && !string.IsNullOrWhiteSpace(searchModel.Query) && apiAvailable)
+        {
+            await PerformSearch();
+        }
     }
 }

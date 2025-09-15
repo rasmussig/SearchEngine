@@ -1,0 +1,110 @@
+/* Modern Search Component Styles */
+.card-body.p-5 {
+  background-color: white;
+  border-radius: 10px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* Green toggle switches */
+.form-check-input:checked {
+    background-color: #28a745 !important;
+    border-color: #28a745 !important;
+}
+
+.form-check-input:focus {
+    border-color: #28a745 !important;
+    box-shadow: 0 0 0 0.25rem rgba(40, 167, 69, 0.25) !important;
+}
+
+/* Rounded search input styling */
+.input-group .form-control {
+    border-left: none;
+    border-right: none;
+}
+
+.input-group .input-group-text {
+    border-right: none;
+}
+
+.input-group .btn {
+    border-left: none;
+}
+
+.input-group:focus-within .input-group-text {
+    border-color: #86b7fe;
+    box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25);
+}
+
+.input-group:focus-within .form-control {
+    border-color: #86b7fe;
+    box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25);
+}
+
+.input-group:focus-within .btn {
+    border-color: #86b7fe;
+    box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25);
+}
+
+/* Rounded elements */
+.rounded-4 {
+    border-radius: 1rem !important;
+}
+
+.rounded-pill {
+    border-radius: 50rem !important;
+}
+
+.rounded-start-pill {
+    border-top-left-radius: 50rem !important;
+    border-bottom-left-radius: 50rem !important;
+}
+
+.rounded-end-pill {
+    border-top-right-radius: 50rem !important;
+    border-bottom-right-radius: 50rem !important;
+}
+
+.rounded-top-4 {
+    border-top-left-radius: 1rem !important;
+    border-top-right-radius: 1rem !important;
+}
+
+/* Enhanced form controls */
+.form-control:focus, .form-select:focus {
+    border-color: #86b7fe;
+    box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25);
+}
+
+/* Badge styling */
+.badge {
+    font-size: 0.75em;
+    font-weight: 500;
+}
+
+/* Text utilities */
+.text-break {
+    word-break: break-all;
+}
+
+/* Card styling */
+.card {
+    border: 1px solid #dee2e6;
+    transition: all 0.2s ease-in-out;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .d-flex.flex-wrap.gap-3 {
+        flex-direction: column;
+        gap: 0.5rem !important;
+    }
+    
+    .form-check {
+        margin-bottom: 0.5rem;
+    }
+}
+
+/* Smooth animations */
+.btn, .form-control, .form-select, .form-check-input, .card {
+    transition: all 0.15s ease-in-out;
+}
