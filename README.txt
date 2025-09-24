@@ -1,7 +1,4 @@
-﻿Version 1: 04-08-2025
-Version 2: 03-09-2025 - Enhanced functionality
-
-This codebase is a PoC searchengine that consist of two programs and a class library.
+﻿This codebase is a PoC searchengine that consist of two programs and a class library.
 
 The two programs are the indexer (also called a crawler) and a search program. Both
 are simple console programs.
@@ -22,9 +19,22 @@ the search program (read-only).
 
 ## SETUP INSTRUCTIONS
 
+### Test Data Setup
+1. Download test data from releases: https://github.com/rasmussig/SearchEngine/releases/download/v1.0.0/Data.zip
+2. Extract the Data.zip file to the same level as the SearchEngine folder:
+   ```
+   YourFolder/
+   ├── SearchEngine/     (this project)
+   └── Data/            (extracted test data)
+       ├── small/
+       ├── medium/
+       └── large/
+   ```
+
+### Running the Application
 1. Update Shared.Paths so the database path points to the correct database location
-2. Update Indexer.Config so the path to files for indexing is correct
-3. Run indexer
+2. The indexer will automatically find the Data folder using the Config.cs setup
+3. Run indexer (dotnet run)
 4. Inspect database - check that all documents are indexed and verify word indexing
 5. Run searchConsole and test with queries (1 word, 2 words, multiple words)
 
