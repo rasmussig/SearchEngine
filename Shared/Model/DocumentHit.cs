@@ -1,26 +1,13 @@
 using System;
 using System.Collections.Generic;
-using System.Text.Json.Serialization;
 
 namespace Shared.Model
 {
+    /// Represents a search result for a single document with hit statistics
     public class DocumentHit
     {
-        [JsonConstructor]
-        public DocumentHit(BEDocument document, int noOfHits, List<string> missing)
-        {
-            Document = document;
-            NoOfHits = noOfHits;
-            Missing = missing;
-        }
-
-        [JsonPropertyName("document")]
-        public BEDocument Document { get;  }
-
-        [JsonPropertyName("noOfHits")]
-        public int NoOfHits { get;  }
-
-        [JsonPropertyName("missing")]
-        public List<string> Missing { get;  }
+        public BEDocument Document { get; set; }    // The document that matched
+        public int NoOfHits { get; set; }           // Number of search term matches found
+        public List<string> Missing { get; set; }   // Search terms not found in this document
     }
 }

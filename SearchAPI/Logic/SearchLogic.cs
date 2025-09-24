@@ -41,10 +41,22 @@ namespace SearchAPI
             {
                 var missing = mDatabase.WordsFromIds(mDatabase.getMissing(doc.mId, wordIds));
                   
-                docresult.Add(new Shared.Model.DocumentHit(doc, docIds[idx++].Value, missing));
+                docresult.Add(new Shared.Model.DocumentHit
+                {
+                    Document = doc,
+                    NoOfHits = docIds[idx++].Value,
+                    Missing = missing
+                });
             }
 
-            return new Shared.Model.SearchResult(query, docIds.Count, docresult, ignored, DateTime.Now - start);
+            return new Shared.Model.SearchResult
+            {
+                Query = query,
+                Hits = docIds.Count,
+                DocumentHits = docresult,
+                Ignored = ignored,
+                TimeUsed = DateTime.Now - start
+            };
         }
     }
 }

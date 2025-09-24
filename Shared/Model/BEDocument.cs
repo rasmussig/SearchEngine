@@ -1,20 +1,13 @@
 ﻿using System;
-using System.Text.Json.Serialization;
 
 namespace Shared.Model
 {
+    /// Represents a single document in the search index with metadata
     public class BEDocument
     {
-        [JsonPropertyName("mId")]
-        public int mId { get; set; }
-
-        [JsonPropertyName("mUrl")]
-        public String mUrl { get; set; }
-
-        [JsonPropertyName("mIdxTime")]
-        public String mIdxTime { get; set; }
-
-        [JsonPropertyName("mCreationTime")]
-        public String mCreationTime { get; set; }
+        public int mId { get; set; }           // Unique document ID in database
+        public string mUrl { get; set; }       // Full file path to the document
+        public string mIdxTime { get; set; }   // When document was indexed
+        public string mCreationTime { get; set; } // When document was created
     }
 }
