@@ -89,16 +89,25 @@
         </div>
 
         <!-- API Status -->
-        <div
-            class="alert @(apiAvailable ? "alert-success" : "alert-danger") d-flex align-items-center border-0 rounded-pill mb-4">
-            <div class="@(apiAvailable ? "bg-success" : "bg-danger") rounded-circle me-2"
-                style="width: 8px; height: 8px;"></div>
-            <strong>SearchAPI Status: </strong> @(apiAvailable ? "Connected" : "Disconnected")
-            @if (!apiAvailable)
+        <div class="alert @(isCheckingConnection ? "alert-warning" : apiAvailable ? "alert-success" : "alert-danger") d-flex align-items-center border-0 rounded-pill mb-4">
+            @if (isCheckingConnection)
             {
-                <button class="btn btn-sm btn-outline-danger ms-auto rounded-pill" @onclick="CheckApiStatus">
-                    <i class="bi bi-arrow-clockwise me-1"></i> Retry
-                </button>
+                <div class="spinner-border spinner-border-sm text-warning me-2" role="status" style="width: 8px; height: 8px;">
+                    <span class="visually-hidden">Loading...</span>
+                </div>
+                <strong>SearchAPI Status:</strong> <text>Checking connection</text>
+            }
+            else
+            {
+                <div class="@(apiAvailable ? "bg-success" : "bg-danger") rounded-circle me-2"
+                    style="width: 8px; height: 8px;"></div>
+                <strong>SearchAPI Status: </strong> @(apiAvailable ? "Connected" : "Disconnected")
+                @if (!apiAvailable)
+                {
+                    <button class="btn btn-sm btn-outline-danger ms-auto rounded-pill" @onclick="CheckApiStatus">
+                        <i class="bi bi-arrow-clockwise me-1"></i> Retry
+                    </button>
+                }
             }
         </div>
 
@@ -219,6 +228,7 @@
     private bool isSearching = false;
     private bool hasSearched = false;
     private bool apiAvailable = false;
+    private bool isCheckingConnection = true;
 
     public class SearchModel
     {
@@ -235,7 +245,12 @@
 
     private async Task CheckApiStatus()
     {
+        isCheckingConnection = true;
+        StateHasChanged();
+        
         apiAvailable = await SearchApi.IsApiAvailableAsync();
+        
+        isCheckingConnection = false;
         StateHasChanged();
     }
 
