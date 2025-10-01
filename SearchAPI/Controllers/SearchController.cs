@@ -26,10 +26,10 @@ namespace SearchAPI.Controllers
 
                 // Split query into words
                 var queryWords = query.Split(' ', StringSplitOptions.RemoveEmptyEntries);
-                
+
                 // Perform search
                 var result = _searchLogic.Search(queryWords, maxResults, caseSensitive);
-                
+
                 return Ok(result);
             }
             catch (Exception ex)
@@ -38,32 +38,11 @@ namespace SearchAPI.Controllers
             }
         }
 
-        [HttpPost]
-        public IActionResult SearchPost([FromBody] SearchRequest request)
+        [HttpGet]
+        [Route("ping")]
+        public string? Ping()
         {
-            try
-            {
-                if (request == null || request.Query == null || request.Query.Length == 0)
-                {
-                    return BadRequest("Query is required");
-                }
-
-                var result = _searchLogic.Search(request.Query, request.MaxResults ?? 20, request.CaseSensitive);
-                
-                return Ok(result);
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, $"Internal server error: {ex.Message}");
-            }
+            return Environment.GetEnvironmentVariable("id");
         }
-    }
-
-    public class SearchRequest
-    {
-        public string[] Query { get; set; } = Array.Empty<string>();
-        public int? MaxResults { get; set; }
-        public bool ShowFullPaths { get; set; } = false;
-        public bool CaseSensitive { get; set; } = false;
     }
 }

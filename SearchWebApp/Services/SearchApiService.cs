@@ -19,17 +19,10 @@ namespace SearchWebApp.Services
         {
             try
             {
-                var searchRequest = new
-                {
-                    Query = query,
-                    MaxResults = maxResults,
-                    CaseSensitive = caseSensitive
-                };
+                var queryString = string.Join(" ", query);
+                var url = $"{_apiBaseUrl}/api/Search?query={Uri.EscapeDataString(queryString)}&maxResults={maxResults}&caseSensitive={caseSensitive}";
 
-                var json = JsonSerializer.Serialize(searchRequest);
-                var content = new StringContent(json, Encoding.UTF8, "application/json");
-
-                var response = await _httpClient.PostAsync($"{_apiBaseUrl}/api/Search", content);
+                var response = await _httpClient.GetAsync(url);
                 
                 if (response.IsSuccessStatusCode)
                 {
