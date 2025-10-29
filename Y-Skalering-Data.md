@@ -177,13 +177,13 @@ API vil automatisk detektere de 3 shards ved opstart.
 
 ```bash
 # Basic search
-curl "http://localhost:5147/api/search?query=meeting&maxResults=10"
+curl "http://localhost:5281/api/search?query=meeting&maxResults=10"
 
 # Multiple words
-curl "http://localhost:5147/api/search?query=project+schedule&maxResults=20"
+curl "http://localhost:5281/api/search?query=project+schedule&maxResults=20"
 
 # Case sensitive
-curl "http://localhost:5147/api/search?query=Enron&maxResults=5&caseSensitive=true"
+curl "http://localhost:5281/api/search?query=Enron&maxResults=5&caseSensitive=true"
 ```
 
 **Forventet resultat:** 
@@ -245,5 +245,5 @@ cd ../DatabaseSplitter && dotnet run
 cd ../SearchAPI && dotnet run
 
 # 4. Test search
-curl "http://localhost:5147/api/search?query=meeting&maxResults=10"
+curl "http://localhost:5281/api/search?query=meeting&maxResults=10"
 ```

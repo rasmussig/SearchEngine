@@ -46,12 +46,14 @@ namespace SearchAPI
 
         public List<KeyValuePair<int, int>> GetDocuments(List<int> wordIds)
         {
+            Console.WriteLine($"[Y-Scaling] Querying {_databases.Count} shards...");
             var allDocs = new Dictionary<int, int>(); // compositeId -> hitCount
             
             int shardIndex = 0;
             foreach (var db in _databases)
             {
                 var docs = db.GetDocuments(wordIds);
+                Console.WriteLine($"[Y-Scaling] Shard {shardIndex + 1}: Found {docs.Count} documents");
                 foreach (var doc in docs)
                 {
                     // Create composite ID: shardIndex * 1000000 + originalDocId
@@ -61,6 +63,8 @@ namespace SearchAPI
                 shardIndex++;
             }
 
+            Console.WriteLine($"[Y-Scaling] Total merged: {allDocs.Count} unique documents");
+            
             // Sort by hit count descending
             return allDocs
                 .OrderByDescending(kvp => kvp.Value)

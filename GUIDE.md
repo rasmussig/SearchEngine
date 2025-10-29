@@ -65,11 +65,11 @@ cd SearchEngine/SearchAPI
 dotnet run
 ```
 
-API starter på: `http://localhost:5147`
+API starter på: `http://localhost:5281`
 
 **Test det:**
 ```bash
-curl "http://localhost:5147/api/search?query=meeting&maxResults=10"
+curl "http://localhost:5281/api/search?query=meeting&maxResults=10"
 ```
 
 **Forventet output:**
@@ -157,7 +157,7 @@ dotnet run
 
 **Test Y-skalering:**
 ```bash
-curl "http://localhost:5147/api/search?query=meeting&maxResults=20"
+curl "http://localhost:5281/api/search?query=meeting&maxResults=20"
 ```
 
 **Forventet:** Resultater fra alle 3 shards merged sammen, sorteret efter relevans.
@@ -205,7 +205,7 @@ cd SearchEngine/LoadBalancer
 dotnet run
 ```
 
-LoadBalancer starter på: `http://localhost:5000`
+LoadBalancer starter på: `http://localhost:5280`
 
 ---
 
@@ -213,21 +213,21 @@ LoadBalancer starter på: `http://localhost:5000`
 
 ```bash
 # Request 1 → API instance 1
-curl "http://localhost:5000/api/search?query=meeting&maxResults=5"
+curl "http://localhost:5280/api/search?query=meeting&maxResults=5"
 
 # Request 2 → API instance 2
-curl "http://localhost:5000/api/search?query=project&maxResults=5"
+curl "http://localhost:5280/api/search?query=project&maxResults=5"
 
 # Request 3 → API instance 3
-curl "http://localhost:5000/api/search?query=email&maxResults=5"
+curl "http://localhost:5280/api/search?query=email&maxResults=5"
 
 # Request 4 → API instance 1 (round-robin)
-curl "http://localhost:5000/api/search?query=schedule&maxResults=5"
+curl "http://localhost:5280/api/search?query=schedule&maxResults=5"
 ```
 
 **Check hvilken instance der handlede requesten:**
 ```bash
-curl "http://localhost:5000/api/search/ping"
+curl "http://localhost:5280/api/search/ping"
 # Output: "1", "2", eller "3" (roterer round-robin)
 ```
 
@@ -279,19 +279,19 @@ dotnet run
 
 ```bash
 # Query gennem LoadBalancer
-curl "http://localhost:5000/api/search?query=meeting+schedule&maxResults=10"
+curl "http://localhost:5280/api/search?query=meeting+schedule&maxResults=10"
 
 # Check hvilken API instance blev brugt
-curl "http://localhost:5000/api/search/ping"
+curl "http://localhost:5280/api/search/ping"
 
 # Gentag - se load rotation
-curl "http://localhost:5000/api/search/ping"
-curl "http://localhost:5000/api/search/ping"
+curl "http://localhost:5280/api/search/ping"
+curl "http://localhost:5280/api/search/ping"
 # Output: "1", "2", "3", "1", "2", "3", ...
 ```
 
 **Hvad sker der:**
-1. Request → LoadBalancer (port 5000)
+1. Request → LoadBalancer (port 5280)
 2. LoadBalancer → Vælger én SearchAPI instance (5281, 5282, eller 5283) via round-robin
 3. SearchAPI → Queries alle 3 database shards via MultiDatabaseWrapper
 4. SearchAPI → Merger resultater og returnerer til LoadBalancer
@@ -303,7 +303,7 @@ curl "http://localhost:5000/api/search/ping"
 
 ### SearchAPI
 
-**Base URL:** `http://localhost:5147` (eller 5281/5282/5283 med load balancer)
+**Base URL:** `http://localhost:5281` (eller 5281/5282/5283 med load balancer)
 
 #### `GET /api/search`
 
@@ -317,7 +317,7 @@ Søg efter dokumenter.
 
 **Eksempel:**
 ```bash
-curl "http://localhost:5147/api/search?query=meeting+project&maxResults=15&caseSensitive=false"
+curl "http://localhost:5281/api/search?query=meeting+project&maxResults=15&caseSensitive=false"
 ```
 
 **Response:**
@@ -344,7 +344,7 @@ Health check endpoint - returnerer API instance ID.
 
 **Eksempel:**
 ```bash
-curl "http://localhost:5147/api/search/ping"
+curl "http://localhost:5281/api/search/ping"
 ```
 
 **Response:** `"1"` (eller miljøvariabel `id` hvis sat)
@@ -353,7 +353,7 @@ curl "http://localhost:5147/api/search/ping"
 
 ### LoadBalancer
 
-**Base URL:** `http://localhost:5000`
+**Base URL:** `http://localhost:5280`
 
 #### `GET /api/search`
 
@@ -448,7 +448,7 @@ cd SearchEngine/indexer && dotnet run
 cd ../SearchAPI && dotnet run
 
 # 3. Test
-curl "http://localhost:5147/api/search?query=meeting&maxResults=10"
+curl "http://localhost:5281/api/search?query=meeting&maxResults=10"
 ```
 
 **Demonstrerer:** Basis funktionalitet
@@ -468,7 +468,7 @@ cd ../DatabaseSplitter && dotnet run
 cd ../SearchAPI && dotnet run
 
 # 4. Test
-curl "http://localhost:5147/api/search?query=meeting&maxResults=10"
+curl "http://localhost:5281/api/search?query=meeting&maxResults=10"
 ```
 
 **Demonstrerer:** Horizontal partitioning, multi-database queries, result merging
@@ -490,7 +490,7 @@ id=3 dotnet run --urls "http://localhost:5283"
 cd ../LoadBalancer && dotnet run
 
 # 4. Test
-curl "http://localhost:5000/api/search/ping"  # Se rotation
+curl "http://localhost:5280/api/search/ping"  # Se rotation
 ```
 
 **Demonstrerer:** Request distribution, round-robin load balancing
@@ -514,7 +514,7 @@ id=3 dotnet run --urls "http://localhost:5283"
 cd ../LoadBalancer && dotnet run
 
 # 4. Test
-curl "http://localhost:5000/api/search?query=meeting+schedule&maxResults=20"
+curl "http://localhost:5280/api/search?query=meeting+schedule&maxResults=20"
 ```
 
 **Demonstrerer:** Fuld distribueret arkitektur med både data-partitioning og load distribution
