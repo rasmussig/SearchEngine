@@ -79,6 +79,38 @@ Users can now control the number of search results with commands:
 - /results=all - shows all available results
 Default changed from 10 to 20 results per search.
 
+### Opgave 6: Load Balancer for SearchAPI
+CHANGED FILES:
+- LoadBalancer/Controllers/SearchController.cs: Implements random load balancing with health checks
+- LoadBalancer/Program.cs: ASP.NET Core setup with HttpClient support
+
+A load balancer that distributes search requests across multiple SearchAPI instances.
+
+FEATURES:
+- Random load balancing strategy across healthy backend instances
+- Health check endpoint (/api/Search/ping) to verify backend availability
+- Automatic failover - only forwards to healthy backends
+- Response headers showing which backend handled each request (X-LoadBalancer-Backend)
+
+HOW TO TEST:
+1. Start multiple SearchAPI instances on different ports:
+   Terminal 1: id=SearchAPI_1 dotnet run --urls "http://localhost:5281" (in SearchAPI folder)
+   Terminal 2: id=SearchAPI_2 dotnet run --urls "http://localhost:5282" (in SearchAPI folder)
+
+2. Start LoadBalancer:
+   Terminal 3: dotnet run (in LoadBalancer folder, runs on port 5280)
+
+3. Check backend status:
+   curl http://localhost:5280/api/Search/status
+
+4. Test search through LoadBalancer:
+   curl "http://localhost:5280/api/Search?query=test&maxResults=5"
+
+5. Verify load distribution (see X-LoadBalancer-Backend header):
+   curl -i "http://localhost:5280/api/Search?query=test&maxResults=5"
+
+6. Test failover by stopping one SearchAPI instance and verify LoadBalancer only uses remaining backends.
+
 ## COMMANDS AVAILABLE IN CONSOLE SEARCH
 
 - /casesensitive=on/off - Toggle case sensitive search
