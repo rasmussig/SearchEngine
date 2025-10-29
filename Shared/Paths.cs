@@ -1,5 +1,7 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Reflection;
 
 namespace Shared
@@ -41,5 +43,16 @@ namespace Shared
         }
         
         public static string DATABASE = Path.Combine(GetDataPath(), "searchDBmedium.db");
+        
+        // Y-scaling: Find all database shards (searchDB_shard1.db, shard2.db, shard3.db)
+        public static List<string> GetDatabaseShards()
+        {
+            string dataPath = GetDataPath();
+            var shardFiles = Directory.GetFiles(dataPath, "searchDB_shard*.db")
+                .OrderBy(f => f)
+                .ToList();
+            
+            return shardFiles;
+        }
     }
 }

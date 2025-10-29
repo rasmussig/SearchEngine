@@ -1,5 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Shared;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace SearchAPI.Controllers
 {
@@ -11,7 +13,20 @@ namespace SearchAPI.Controllers
 
         public SearchController()
         {
-            _searchLogic = new SearchLogic(new DatabaseSqlite());
+            // Y-scaling: Auto-detect database shards
+            var shardPaths = Paths.GetDatabaseShards();
+            
+            if (shardPaths.Count > 0)
+            {
+                // Multiple shards found - use MultiDatabaseWrapper
+                var databases = shardPaths.Select(path => new DatabaseSqlite(path) as IDatabase).ToList();
+                _searchLogic = new SearchLogic(new MultiDatabaseWrapper(databases));
+            }
+            else
+            {
+                // No shards - use single database
+                _searchLogic = new SearchLogic(new DatabaseSqlite());
+            }
         }
 
         [HttpGet]

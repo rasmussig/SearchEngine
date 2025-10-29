@@ -16,15 +16,18 @@ namespace SearchAPI
         public DatabaseSqlite()
         {
             var connectionStringBuilder = new SqliteConnectionStringBuilder();
-
             connectionStringBuilder.DataSource = Paths.DATABASE;
-
-
             _connection = new SqliteConnection(connectionStringBuilder.ConnectionString);
-
             _connection.Open();
+        }
 
-
+        // Y-scaling: Constructor accepting custom database path
+        public DatabaseSqlite(string databasePath)
+        {
+            var connectionStringBuilder = new SqliteConnectionStringBuilder();
+            connectionStringBuilder.DataSource = databasePath;
+            _connection = new SqliteConnection(connectionStringBuilder.ConnectionString);
+            _connection.Open();
         }
 
         private void Execute(string sql)

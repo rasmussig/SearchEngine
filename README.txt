@@ -1,21 +1,49 @@
-﻿This codebase is a PoC searchengine that consist of two programs and a class library.
+﻿This codebase is a PoC searchengine that consist of multiple programs and a class library.
 
-The two programs are the indexer (also called a crawler) and a search program. Both
-are simple console programs.
+## 📚 FULL DOCUMENTATION
 
-The indexer will crawl a folder (in depth) and create a reverse index
-in a database. It will only index text files with .txt as extension.
+**For complete usage instructions, see:** `GUIDE.md`
 
-The search program (see the ConsoleSearch project) offers a query-based search
-in the reverse index.
+The guide covers:
+- Indexing data
+- Database sharding (Y-scaling)
+- Running SearchAPI
+- Load balancing with multiple instances
+- Full demo setups
+
+---
+
+## QUICK START
+
+```bash
+# 1. Index data
+cd indexer && dotnet run
+
+# 2. Start SearchAPI
+cd ../SearchAPI && dotnet run
+
+# 3. Test search
+curl "http://localhost:5147/api/search?query=meeting&maxResults=10"
+```
+
+---
+
+## COMPONENTS
+
+The two main programs are the indexer (also called a crawler) and SearchAPI (REST API).
+
+**Indexer** - Crawls folders and creates reverse index in SQLite database
+**SearchAPI** - REST API for searching (with auto-detection of database shards)
+**DatabaseSplitter** - Splits database into shards for Y-scaling
+**LoadBalancer** - Distributes requests across multiple SearchAPI instances
+**ConsoleSearch** - Legacy console search interface (deprecated, use SearchAPI)
 
 The class library Shared contains classes that are used by the indexer
-and the ConsoleSearch. It contains:
+and SearchAPI. It contains:
 
-- Paths containing a static path the database (used by both the indexer (write-only), and
-the search program (read-only).
-- BEDocument (BE for Business Entity) - a class representing a document.
-- Config containing global configuration settings.
+- Paths containing static paths to databases (used by both indexer and SearchAPI)
+- BEDocument (BE for Business Entity) - a class representing a document
+- Config containing global configuration settings
 
 ## SETUP INSTRUCTIONS
 

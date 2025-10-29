@@ -16,6 +16,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Shared", "Shared\Shared.csp
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SearchAPI", "SearchAPI\SearchAPI.csproj", "{48EDA91F-0A42-4237-951E-39604E5D7E86}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DatabaseSplitter", "DatabaseSplitter\DatabaseSplitter.csproj", "{DC05EED8-F478-46D0-8A1E-52086A8A3222}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -74,6 +76,18 @@ Global
 		{48EDA91F-0A42-4237-951E-39604E5D7E86}.Release|x64.Build.0 = Release|Any CPU
 		{48EDA91F-0A42-4237-951E-39604E5D7E86}.Release|x86.ActiveCfg = Release|Any CPU
 		{48EDA91F-0A42-4237-951E-39604E5D7E86}.Release|x86.Build.0 = Release|Any CPU
+		{DC05EED8-F478-46D0-8A1E-52086A8A3222}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DC05EED8-F478-46D0-8A1E-52086A8A3222}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DC05EED8-F478-46D0-8A1E-52086A8A3222}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{DC05EED8-F478-46D0-8A1E-52086A8A3222}.Debug|x64.Build.0 = Debug|Any CPU
+		{DC05EED8-F478-46D0-8A1E-52086A8A3222}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{DC05EED8-F478-46D0-8A1E-52086A8A3222}.Debug|x86.Build.0 = Debug|Any CPU
+		{DC05EED8-F478-46D0-8A1E-52086A8A3222}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DC05EED8-F478-46D0-8A1E-52086A8A3222}.Release|Any CPU.Build.0 = Release|Any CPU
+		{DC05EED8-F478-46D0-8A1E-52086A8A3222}.Release|x64.ActiveCfg = Release|Any CPU
+		{DC05EED8-F478-46D0-8A1E-52086A8A3222}.Release|x64.Build.0 = Release|Any CPU
+		{DC05EED8-F478-46D0-8A1E-52086A8A3222}.Release|x86.ActiveCfg = Release|Any CPU
+		{DC05EED8-F478-46D0-8A1E-52086A8A3222}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
