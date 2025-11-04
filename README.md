@@ -22,6 +22,13 @@ Dette dokument beskriver hvordan du bruger hele search engine systemet fra start
 4. **LoadBalancer** - Distribuerer requests til multiple SearchAPI instances
 5. **ConsoleSearch** - Kommandolinje søge-interface (deprecated, brug SearchAPI)
 
+The class library Shared contains classes that are used by the indexer
+and SearchAPI. It contains:
+
+- Paths containing static paths to databases (used by both indexer and SearchAPI)
+- BEDocument (BE for Business Entity) - a class representing a document
+- Config containing global configuration settings
+
 **Arkitektur Flow:**
 ```
 Data Files → Indexer → Database → DatabaseSplitter → Shards
@@ -35,6 +42,20 @@ Data Files → Indexer → Database → DatabaseSplitter → Shards
 
 ---
 
+## SETUP INSTRUCTIONS
+
+### Test Data Setup
+1. Download test data from releases: https://github.com/rasmussig/SearchEngine/releases/download/v1.0.0/Data.zip
+2. Extract the Data.zip file to the same level as the SearchEngine folder:
+   ```
+   YourFolder/
+   ├── SearchEngine/     (this project)
+   └── Data/            (extracted test data)
+       ├── small/
+       ├── medium/
+       └── large/
+   ```
+   
 ## 🚀 Quick Start (Basis Setup)
 
 ### Trin 1: Indexer Dokumenter
@@ -365,55 +386,6 @@ Returnerer ID fra én af backend API instances (roterer round-robin).
 
 ---
 
-## 🛠️ Troubleshooting
-
-### Problem: "Database not found"
-
-**Løsning:** Kør indexer først:
-```bash
-cd SearchEngine/indexer && dotnet run
-```
-
-### Problem: "No shards found" (når du forventer shards)
-
-**Løsning:** Kør DatabaseSplitter:
-```bash
-cd SearchEngine/DatabaseSplitter && dotnet run
-```
-
-### Problem: SearchAPI crasher med "Database locked"
-
-**Årsag:** Anden process har databasen åben (fx anden SearchAPI instance eller SQLite browser)
-
-**Løsning:** 
-1. Luk alle SearchAPI instances
-2. Luk SQLite browser/viewer værktøjer
-3. Genstart SearchAPI
-
-### Problem: LoadBalancer returnerer "Connection refused"
-
-**Årsag:** SearchAPI instances ikke startet eller forkerte ports
-
-**Løsning:** 
-1. Verificer SearchAPI instances kører:
-```bash
-curl http://localhost:5281/api/search/ping
-curl http://localhost:5282/api/search/ping
-curl http://localhost:5283/api/search/ping
-```
-2. Check LoadBalancer konfiguration i `LoadBalancer/Program.cs`
-
-### Problem: Queries returnerer duplikerede resultater
-
-**Årsag:** Du har kopieret samme database til alle shards (ikke splittet korrekt)
-
-**Løsning:** Brug DatabaseSplitter til at lave ægte split:
-```bash
-cd SearchEngine/DatabaseSplitter && dotnet run
-```
-
----
-
 ## 📚 Arkitektur-Koncepter
 
 ### Y-Skalering (Horizontal Partitioning)
@@ -428,7 +400,7 @@ cd SearchEngine/DatabaseSplitter && dotnet run
 - **Trade-off:** Hurtigere søgning (kun query relevante shards)
 - **Status:** Ikke implementeret (kun Y-skalering er implementeret)
 
-### Load Balancing
+### Load Balancing (X-skalering af api)
 - **Formål:** Distribuér requests over flere API instances
 - **Strategi:** Round-robin (1→2→3→1→2→3...)
 - **Fordel:** Højere throughput, bedre resource udnyttelse
