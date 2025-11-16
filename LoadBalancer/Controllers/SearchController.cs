@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using System.Text;
 using System.Text.Json;
+using Microsoft.Extensions.Configuration;
 
 namespace LoadBalancer.Controllers
 {
@@ -12,17 +13,22 @@ namespace LoadBalancer.Controllers
         private readonly ILogger<SearchController> _logger;
         private readonly Random _random = new();
         
-        private readonly List<string> _backendUrls = new()
-        {
-            "http://localhost:5281",
-            "http://localhost:5282", 
-            "http://localhost:5283"
-        };
+        private readonly List<string> _backendUrls;
 
-        public SearchController(HttpClient httpClient, ILogger<SearchController> logger)
+        public SearchController(HttpClient httpClient, ILogger<SearchController> logger, IConfiguration configuration)
         {
             _httpClient = httpClient;
             _logger = logger;
+            
+            // Read backend URLs from configuration (supports both local and Docker)
+            _backendUrls = configuration.GetSection("BackendUrls").Get<List<string>>() ?? new()
+            {
+                "http://localhost:5281",
+                "http://localhost:5282", 
+                "http://localhost:5283"
+            };
+            
+            _logger.LogInformation("LoadBalancer configured with backends: {Backends}", string.Join(", ", _backendUrls));
         }
 
         [HttpGet("status")]

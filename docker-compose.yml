@@ -1,0 +1,100 @@
+version: '3.8'
+
+services:
+  # SearchAPI Instance 1
+  searchapi1:
+    build:
+      context: .
+      dockerfile: SearchAPI/Dockerfile
+    container_name: searchapi1
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ASPNETCORE_URLS=http://+:8080
+      - id=1
+    ports:
+      - "5281:8080"
+    volumes:
+      - ../Data:/app/Data:ro  # Read-only access to database
+    networks:
+      - searchengine-network
+    restart: unless-stopped
+
+  # SearchAPI Instance 2
+  searchapi2:
+    build:
+      context: .
+      dockerfile: SearchAPI/Dockerfile
+    container_name: searchapi2
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ASPNETCORE_URLS=http://+:8080
+      - id=2
+    ports:
+      - "5282:8080"
+    volumes:
+      - ../Data:/app/Data:ro
+    networks:
+      - searchengine-network
+    restart: unless-stopped
+
+  # SearchAPI Instance 3
+  searchapi3:
+    build:
+      context: .
+      dockerfile: SearchAPI/Dockerfile
+    container_name: searchapi3
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ASPNETCORE_URLS=http://+:8080
+      - id=3
+    ports:
+      - "5283:8080"
+    volumes:
+      - ../Data:/app/Data:ro
+    networks:
+      - searchengine-network
+    restart: unless-stopped
+
+  # LoadBalancer
+  loadbalancer:
+    build:
+      context: .
+      dockerfile: LoadBalancer/Dockerfile
+    container_name: loadbalancer
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Docker
+      - ASPNETCORE_URLS=http://+:8080
+    ports:
+      - "5280:8080"
+    depends_on:
+      - searchapi1
+      - searchapi2
+      - searchapi3
+    networks:
+      - searchengine-network
+    restart: unless-stopped
+
+  # SearchWebApp (Blazor Frontend)
+  webapp:
+    build:
+      context: .
+      dockerfile: SearchWebApp/Dockerfile
+    container_name: searchwebapp
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ASPNETCORE_URLS=http://+:8080
+      - SearchApi__BaseUrl=http://loadbalancer:8080
+    ports:
+      - "5000:8080"
+    depends_on:
+      - loadbalancer
+    networks:
+      - searchengine-network
+    restart: unless-stopped
+
+networks:
+  searchengine-network:
+    driver: bridge
+
+volumes:
+  search-data:

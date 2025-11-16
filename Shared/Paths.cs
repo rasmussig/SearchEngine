@@ -8,7 +8,30 @@ namespace Shared
 {
     public class Paths
     {
-        // Find the project root (where SearchEngine.sln is located)
+        // Get the Data folder path (Docker or local)
+        public static string GetDataPath()
+        {
+            // Docker: Data is mounted at /app/Data
+            string dockerDataPath = "/app/Data";
+            if (Directory.Exists(dockerDataPath))
+            {
+                return dockerDataPath;
+            }
+            
+            // Local: Find via project root
+            string projectRoot = GetProjectRoot();
+            // Go up one level from SearchEngine folder to get to the main folder, then into Data
+            string dataPath = Path.Combine(Directory.GetParent(projectRoot).FullName, "Data");
+            
+            if (!Directory.Exists(dataPath))
+            {
+                throw new DirectoryNotFoundException($"Data folder not found at: {dataPath}");
+            }
+            
+            return dataPath;
+        }
+        
+        // Find the project root (where SearchEngine.sln is located) - only for local development
         private static string GetProjectRoot()
         {
             string currentDir = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
@@ -25,21 +48,6 @@ namespace Shared
             }
             
             return currentDir;
-        }
-        
-        // Get the Data folder path relative to project
-        public static string GetDataPath()
-        {
-            string projectRoot = GetProjectRoot();
-            // Go up one level from SearchEngine folder to get to the main folder, then into Data
-            string dataPath = Path.Combine(Directory.GetParent(projectRoot).FullName, "Data");
-            
-            if (!Directory.Exists(dataPath))
-            {
-                throw new DirectoryNotFoundException($"Data folder not found at: {dataPath}");
-            }
-            
-            return dataPath;
         }
         
         public static string DATABASE = Path.Combine(GetDataPath(), "searchDBmedium.db");

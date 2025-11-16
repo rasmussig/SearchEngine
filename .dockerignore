@@ -1,0 +1,25 @@
+# Ignore build artifacts
+**/bin/
+**/obj/
+**/out/
+
+# Ignore IDE files
+.vs/
+.vscode/
+*.user
+*.suo
+
+# Ignore git
+.git/
+.gitignore
+
+# Ignore documentation
+*.md
+README.txt
+
+# Ignore data files (we'll mount them separately)
+# Data/
+
+# Ignore unnecessary files
+**/node_modules/
+**/.DS_Store
