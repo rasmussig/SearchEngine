@@ -1,0 +1,42 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: searchwebapp
+  labels:
+    app: searchwebapp
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: searchwebapp
+  template:
+    metadata:
+      labels:
+        app: searchwebapp
+    spec:
+      containers:
+      - name: searchwebapp
+        image: searchengine-webapp:latest
+        imagePullPolicy: Never
+        ports:
+        - containerPort: 8080
+        env:
+        - name: ASPNETCORE_ENVIRONMENT
+          value: "Development"
+        - name: ASPNETCORE_URLS
+          value: "http://+:8080"
+        - name: SearchApi__BaseUrl
+          value: "http://loadbalancer:8080"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: searchwebapp
+spec:
+  selector:
+    app: searchwebapp
+  ports:
+  - port: 8080
+    targetPort: 8080
+    nodePort: 30000  # External access
+  type: NodePort

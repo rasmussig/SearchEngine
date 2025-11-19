@@ -1,0 +1,47 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: searchapi
+  labels:
+    app: searchapi
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: searchapi
+  template:
+    metadata:
+      labels:
+        app: searchapi
+    spec:
+      containers:
+      - name: searchapi
+        image: searchengine-searchapi:latest
+        imagePullPolicy: Never  # Use local image built by Minikube
+        ports:
+        - containerPort: 8080
+        env:
+        - name: ASPNETCORE_ENVIRONMENT
+          value: "Development"
+        - name: ASPNETCORE_URLS
+          value: "http://+:8080"
+        volumeMounts:
+        - name: data-volume
+          mountPath: /app/Data
+          readOnly: true
+      volumes:
+      - name: data-volume
+        persistentVolumeClaim:
+          claimName: searchengine-data-pvc
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: searchapi
+spec:
+  selector:
+    app: searchapi
+  ports:
+  - port: 8080
+    targetPort: 8080
+  type: ClusterIP  # Internal service

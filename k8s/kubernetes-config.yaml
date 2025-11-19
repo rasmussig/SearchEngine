@@ -1,0 +1,6 @@
+# LoadBalancer Kubernetes Configuration
+{
+  "BackendUrls": [
+    "http://searchapi:8080"
+  ]
+}
